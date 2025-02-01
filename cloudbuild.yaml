@@ -28,6 +28,18 @@ steps:
     - '--set-env-vars'
     - 'TELEGRAM_BOT_TOKEN=${_TELEGRAM_BOT_TOKEN},WEBHOOK_URL=${_WEBHOOK_URL},OPENAI_API_KEY=${_OPENAI_API_KEY}'
 
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+    - 'run'
+    - 'services'
+    - 'add-iam-policy-binding'
+    - '$REPO_NAME'
+    - '--region=us-central1'
+    - '--member=allUsers'
+    - '--role=roles/run.invoker'
+
 images:
   - 'gcr.io/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA'
 

@@ -150,7 +150,6 @@ async def handle_tweet_confirmation(update: Update, context: ContextTypes.DEFAUL
 async def main():
     '''Initializes and runs the Telegram bot with webhook support'''
     
-    
     # Initialize OpenAI first, before any user connections
     assistant_id, thread_id = await initialize_openai()
     if not assistant_id or not thread_id:
@@ -167,18 +166,18 @@ async def main():
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     # Set the webhook with error handling
-    try:
-        # webhook_info = await application.bot.get_webhook_info()
-        # logger.info(f"Current webhook status: {webhook_info.to_dict()}")
-        
-        await application.bot.set_webhook(
-            url=f"{WEBHOOK_URL}/telegram",
-            allowed_updates=Update.ALL_TYPES
-        )
-        
-    except Exception as e:
-        logger.error(f"Failed to set webhook: {str(e)}")
-        raise
+    if WEBHOOK_URL:
+        try:
+            await application.bot.set_webhook(
+                url=f"{WEBHOOK_URL}/telegram",
+                allowed_updates=Update.ALL_TYPES
+            )
+            logger.info(f"Webhook set to {WEBHOOK_URL}/telegram")
+        except Exception as e:
+            logger.warning(f"Failed to set webhook: {str(e)}")
+            # Don't raise the error, let the app continue
+    else:
+        logger.warning("No WEBHOOK_URL provided, skipping webhook setup")
 
     # Set up the Flask app
     flask_app = Flask(__name__)

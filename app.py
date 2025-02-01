@@ -201,10 +201,14 @@ async def main():
     # Add logging to webhook endpoint
     @flask_app.route('/telegram', methods=['POST'])
     async def telegram_webhook():
-        """Handle incoming Telegram updates by putting them into the `update_queue`"""
-       
+        """Handle incoming Telegram updates with enhanced logging"""
+        logger.info("Received webhook call")
         try:
-            update = Update.de_json(request.get_json(), application.bot)
+            json_data = request.get_json()
+            logger.info(f"Webhook payload: {json_data}")
+            
+            update = Update.de_json(json_data, application.bot)
+            logger.info(f"Processed update object: {update}")
             
             await application.update_queue.put(update)
             return Response(status=HTTPStatus.OK)
@@ -218,6 +222,23 @@ async def main():
         response = make_response("The bot is still running fine :)", HTTPStatus.OK)
         response.mimetype = "text/plain"
         return response
+
+    @flask_app.route('/webhook-debug', methods=['GET'])
+    async def webhook_debug():
+        '''Debug endpoint to check webhook status'''
+        try:
+            webhook_info = await application.bot.get_webhook_info()
+            response = {
+                'webhook_url': webhook_info.url,
+                'has_custom_certificate': webhook_info.has_custom_certificate,
+                'pending_update_count': webhook_info.pending_update_count,
+                'last_error_message': webhook_info.last_error_message,
+                'last_error_date': webhook_info.last_error_date,
+                'max_connections': webhook_info.max_connections
+            }
+            return make_response(str(response), HTTPStatus.OK)
+        except Exception as e:
+            return make_response(f"Error getting webhook info: {str(e)}", HTTPStatus.INTERNAL_SERVER_ERROR)
 
     webserver = uvicorn.Server(
         config=uvicorn.Config(

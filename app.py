@@ -188,7 +188,6 @@ async def main():
             
         except Exception as e:
             logger.error(f"Failed to set webhook: {str(e)}")
-            logger.error(f"Webhook URL attempted: {webhook_url}")
             logger.error(f"Error type: {type(e).__name__}")
             # Don't raise the error, let the app continue
     else:

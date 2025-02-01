@@ -22,21 +22,13 @@ steps:
     - 'managed'
     - '--allow-unauthenticated'
     - '--set-env-vars'
-    - 'TELEGRAM_API_ID=$$TELEGRAM_API_ID,TELEGRAM_API_HASH=$$TELEGRAM_API_HASH,TELEGRAM_BOT_TOKEN=$$TELEGRAM_BOT_TOKEN,WEBHOOK_URL=$$WEBHOOK_URL,OPENAI_API_KEY=$$OPENAI_API_KEY'
-    secretEnv: ['TELEGRAM_API_ID', 'TELEGRAM_API_HASH', 'TELEGRAM_BOT_TOKEN', 'WEBHOOK_URL', 'OPENAI_API_KEY']
+    - 'TELEGRAM_BOT_TOKEN=${_TELEGRAM_BOT_TOKEN},WEBHOOK_URL=${_WEBHOOK_URL},OPENAI_API_KEY=${_OPENAI_API_KEY}'
 
 images:
   - 'gcr.io/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA'
 
-availableSecrets:
-  secretManager:
-    - versionName: projects/$PROJECT_ID/secrets/TELEGRAM_API_ID/versions/latest
-      env: 'TELEGRAM_API_ID'
-    - versionName: projects/$PROJECT_ID/secrets/TELEGRAM_API_HASH/versions/latest
-      env: 'TELEGRAM_API_HASH'
-    - versionName: projects/$PROJECT_ID/secrets/TELEGRAM_BOT_TOKEN/versions/latest
-      env: 'TELEGRAM_BOT_TOKEN'
-    - versionName: projects/$PROJECT_ID/secrets/WEBHOOK_URL/versions/latest
-      env: 'WEBHOOK_URL'
-    - versionName: projects/$PROJECT_ID/secrets/OPENAI_API_KEY/versions/latest
-      env: 'OPENAI_API_KEY'
+# Define substitutions with dummy values
+substitutions:
+  _TELEGRAM_BOT_TOKEN: 'dummy-token'
+  _WEBHOOK_URL: 'dummy-url'
+  _OPENAI_API_KEY: 'dummy-key'

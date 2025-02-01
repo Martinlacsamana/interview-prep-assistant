@@ -76,7 +76,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         prompt = update.message.text
         logging.info(f"Received prompt from user {update.effective_user.id}: {prompt}")
 
-        # Generate tweet from the prompt
         try:
             # Use global thread ID
             tweet = await helpers.openai.generate_tweet(

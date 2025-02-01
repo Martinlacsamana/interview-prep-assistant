@@ -1,3 +1,7 @@
+# Add these options at the top level of your cloudbuild.yaml
+options:
+  logging: CLOUD_LOGGING_ONLY
+
 steps:
   # Build the container image
   - name: 'gcr.io/cloud-builders/docker'

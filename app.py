@@ -165,19 +165,35 @@ async def main():
     application.add_handler(CallbackQueryHandler(handle_tweet_confirmation, pattern='^(post_tweet|regenerate)$'))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
-    # Set the webhook with error handling
+    # Enhanced webhook setup logging
     if WEBHOOK_URL:
+        webhook_url = f"{WEBHOOK_URL}/telegram"
+        logger.info(f"Attempting to set webhook with URL: {webhook_url}")
+        
         try:
+            # Get current webhook info for debugging
+            webhook_info = await application.bot.get_webhook_info()
+            logger.info(f"Current webhook status: {webhook_info.to_dict()}")
+            
+            # Try to set the webhook
             await application.bot.set_webhook(
-                url=f"{WEBHOOK_URL}/telegram",
+                url=webhook_url,
                 allowed_updates=Update.ALL_TYPES
             )
-            logger.info(f"Webhook set to {WEBHOOK_URL}/telegram")
+            logger.info(f"Successfully set webhook to: {webhook_url}")
+            
+            # Verify webhook was set correctly
+            new_webhook_info = await application.bot.get_webhook_info()
+            logger.info(f"New webhook status: {new_webhook_info.to_dict()}")
+            
         except Exception as e:
-            logger.warning(f"Failed to set webhook: {str(e)}")
+            logger.error(f"Failed to set webhook: {str(e)}")
+            logger.error(f"Webhook URL attempted: {webhook_url}")
+            logger.error(f"Error type: {type(e).__name__}")
             # Don't raise the error, let the app continue
     else:
-        logger.warning("No WEBHOOK_URL provided, skipping webhook setup")
+        logger.warning("No WEBHOOK_URL provided or it's empty")
+        logger.warning(f"WEBHOOK_URL value: '{WEBHOOK_URL}'")
 
     # Set up the Flask app
     flask_app = Flask(__name__)

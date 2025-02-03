@@ -26,7 +26,7 @@ steps:
     - 'managed'
     - '--allow-unauthenticated'
     - '--set-env-vars'
-    - 'TELEGRAM_BOT_TOKEN=${_TELEGRAM_BOT_TOKEN},WEBHOOK_URL=${_WEBHOOK_URL},OPENAI_API_KEY=${_OPENAI_API_KEY}'
+    - 'TELEGRAM_BOT_TOKEN=${_TELEGRAM_BOT_TOKEN},WEBHOOK_URL=${_WEBHOOK_URL},OPENAI_API_KEY=${_OPENAI_API_KEY}, ASSISTANT_ID=${_ASSISTANT_ID}, THREAD_ID=${_THREAD_ID}'
 
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -48,3 +48,5 @@ substitutions:
   _TELEGRAM_BOT_TOKEN: 'dummy-token'
   _WEBHOOK_URL: 'dummy-url'
   _OPENAI_API_KEY: 'dummy-key'
+  _ASSISTANT_ID: 'dummy-id'
+  _THREAD_ID: 'dummy-id'

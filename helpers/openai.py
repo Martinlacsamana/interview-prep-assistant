@@ -31,7 +31,7 @@ async def generate_response(prompt):
             assistant_id=assistant_ID,
             additional_messages=[{
                 "role": "user",
-                "content": prompt  # Simplified - just send the raw prompt
+                "content": prompt  
             }]
         )
 

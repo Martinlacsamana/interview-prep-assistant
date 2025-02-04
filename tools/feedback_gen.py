@@ -46,6 +46,17 @@ async def analyze_interactions(user_id: str, days: int = 30) -> Dict:
         logger.error(f"Error generating feedback: {str(e)}")
         raise
 
+async def generate_feedback_report(days: int = 30) -> Dict:
+    """Generate a feedback report for the user's recent interactions"""
+    try:
+        # We'll use thread_ID as user_id for now
+        from helpers.openai import thread_ID
+        feedback = await analyze_interactions(thread_ID, days)
+        return feedback
+    except Exception as e:
+        logger.error(f"Error generating feedback report: {str(e)}")
+        raise
+
 TOOL_DEFINITION = {
     "type": "function",
     "function": {

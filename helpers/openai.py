@@ -6,6 +6,10 @@ from openai import AsyncOpenAI
 from dotenv import load_dotenv
 from typing import List
 import aiohttp
+from tools.cheatsheet_gen import generate_cheatsheet, TOOL_DEFINITION as CHEATSHEET_TOOL
+from tools.problem_gen import generate_practice_problem, TOOL_DEFINITION as PROBLEM_TOOL
+from tools.feedback_gen import generate_feedback_report, TOOL_DEFINITION as FEEDBACK_TOOL
+from helpers.mongodb import store_interaction
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -13,6 +17,9 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 client = AsyncOpenAI()
+
+# Tools list
+tools = [CHEATSHEET_TOOL, PROBLEM_TOOL, FEEDBACK_TOOL]
 
 # Initialize empty list to store interactions as dictionaries
 conversation_history: List[dict] = []
@@ -31,15 +38,62 @@ async def generate_response(prompt):
             assistant_id=assistant_ID,
             additional_messages=[{
                 "role": "user",
-                "content": prompt  
+                "content": prompt
             }]
         )
+
+        # Add function calling handling
+        if hasattr(run, 'required_action'):
+            tool_calls = run.required_action.submit_tool_outputs.tool_calls
+            tool_outputs = []
+            
+            for tool_call in tool_calls:
+                if tool_call.function.name == "generate_cheatsheet":
+                    args = json.loads(tool_call.function.arguments)
+                    success = await generate_cheatsheet(args["topic"])
+                    tool_outputs.append({
+                        "tool_call_id": tool_call.id,
+                        "output": json.dumps({"success": success})
+                    })
+                elif tool_call.function.name == "generate_practice_problem":
+                    args = json.loads(tool_call.function.arguments)
+                    # Extract optional arguments with defaults
+                    topic = args.get("topic", None)
+                    difficulty = args.get("difficulty", None)
+                    problem = await generate_practice_problem(topic, difficulty)
+                    tool_outputs.append({
+                        "tool_call_id": tool_call.id,
+                        "output": json.dumps(problem)  # Returns the full problem dict
+                    })
+                elif tool_call.function.name == "generate_feedback_report":
+                    args = json.loads(tool_call.function.arguments)
+                    days = args.get("days", 30)  # default to 30 days if not specified
+                    feedback = await generate_feedback_report(days)
+                    tool_outputs.append({
+                        "tool_call_id": tool_call.id,
+                        "output": json.dumps(feedback)  # Returns the feedback report dict
+                    })
+            
+            # Submit outputs back to the assistant
+            run = await client.beta.threads.runs.submit_tool_outputs_and_poll(
+                thread_id=thread_ID,
+                run_id=run.id,
+                tool_outputs=tool_outputs
+            )
 
         if run.status == "completed":
             messages = await client.beta.threads.messages.list(thread_id=thread_ID)
             response = messages.data[0].content[0].text.value
             
-            # Store conversation history (optional now)
+            # Store interaction in MongoDB
+            tools_used = [tool_call.function.name for tool_call in tool_calls] if hasattr(run, 'required_action') else []
+            await store_interaction(
+                user_id=thread_ID,
+                prompt=prompt,
+                response=response,
+                tools_used=tools_used
+            )
+            
             conversation_history.append({
                 'role': 'user',
                 'content': prompt

@@ -6,3 +6,6 @@ Flask[async]==2.3.2
 openai==1.58.1
 requests
 aiohttp==3.9.3
+sendgrid
+motor==3.3.2
+pymongo==4.6.1

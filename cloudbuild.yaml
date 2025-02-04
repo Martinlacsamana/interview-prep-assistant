@@ -26,8 +26,7 @@ steps:
     - 'managed'
     - '--allow-unauthenticated'
     - '--set-env-vars'
-    - 'TELEGRAM_BOT_TOKEN=${_TELEGRAM_BOT_TOKEN},WEBHOOK_URL=${_WEBHOOK_URL},OPENAI_API_KEY=${_OPENAI_API_KEY}, ASSISTANT_ID=${_ASSISTANT_ID}, THREAD_ID=${_THREAD_ID}'
-
+    - 'TELEGRAM_BOT_TOKEN=${_TELEGRAM_BOT_TOKEN},WEBHOOK_URL=${_WEBHOOK_URL},OPENAI_API_KEY=${_OPENAI_API_KEY}, ASSISTANT_ID=${_ASSISTANT_ID}, THREAD_ID=${_THREAD_ID}, MONGODB_URI=${_MONGODB_URI}, SENDGRID_API_KEY=${_SENDGRID_API_KEY}'
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
@@ -49,4 +48,6 @@ substitutions:
   _WEBHOOK_URL: 'dummy-url'
   _OPENAI_API_KEY: 'dummy-key'
   _ASSISTANT_ID: 'dummy-id'
-  _THREAD_ID: 'dummy-id'
+  _THREAD_ID: 'dummy-id',
+  _MONGODB_URI: 'dummy-uri'
+  _SENDGRID_API_KEY: 'dummy-key'

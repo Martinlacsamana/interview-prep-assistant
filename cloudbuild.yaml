@@ -48,6 +48,6 @@ substitutions:
   _WEBHOOK_URL: 'dummy-url'
   _OPENAI_API_KEY: 'dummy-key'
   _ASSISTANT_ID: 'dummy-id'
-  _THREAD_ID: 'dummy-id',
+  _THREAD_ID: 'dummy-id'
   _MONGODB_URI: 'dummy-uri'
   _SENDGRID_API_KEY: 'dummy-key'

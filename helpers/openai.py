@@ -42,6 +42,11 @@ async def generate_response(prompt):
             }]
         )
 
+        # Add detailed logging here
+        logger.info(f"Run status: {run.status}")
+        if run.status == "failed":
+            logger.info(f"Run failed with last_error: {run.last_error}")
+
         # Comment out tool handling section
         # if hasattr(run, 'required_action'):
         #     tool_calls = run.required_action.submit_tool_outputs.tool_calls
@@ -104,6 +109,10 @@ async def generate_response(prompt):
             
             return response
         else:
+            # Add detailed logging for non-completed status
+            logger.error(f"Run failed with status: {run.status}")
+            logger.error(f"Run details: {run}")  # log full run object
+            logger.error(f"Last error: {getattr(run, 'last_error', 'No error details available')}")
             return f"Conversation failed with status: {run.status}"
 
     except Exception as e:

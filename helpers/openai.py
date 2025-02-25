@@ -107,6 +107,9 @@ async def generate_response(prompt):
                 'content': response
             })
             
+            # Log the run details
+            logger.info(f"Run details: {run}")
+            
             return response
         else:
             # Add detailed logging for non-completed status
